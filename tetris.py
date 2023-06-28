@@ -6,11 +6,13 @@ W, H = 10, 20
 TILE = 45
 GAME_RES = W * TILE, H * TILE
 FPS = 60
+RES = 750, 940
+
 
 pygame.init()
-game_sc = pygame.display.set_mode(GAME_RES)
+sc = pygame.display.set_mode(RES)
+game_sc = pygame.Surface(GAME_RES)
 clock = pygame.time.Clock()
-
 grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(W) for y in range(H)]
 
 figures_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],
@@ -23,27 +25,33 @@ figures_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],
 
 figures = [[pygame.Rect(x + W // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
 figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
-field = [0 for i in range(W) for j in range(H)]
+field = [[0 for i in range(W)] for j in range(H)]
 
 
 anim_count, anim_speed, anim_limit = 0, 60, 2000
 figure = deepcopy(choice(figures))
 
 
+bg = pygame.image.load('bg.jpg').convert()
+game_bg = pygame.image.load('bg2.jpg').convert()
+
 
 
 
 def check_borders():
-    if figure[i].x < 0 or figure[i].y > W - 1:
+    if figure[i].x < 0 or figure[i].x > W - 1:
         return False
-    elif figures[i].y > H - 1 or field[figure[i].y][figure[i].x]:
+    elif figure[i].y > H - 1 or field[figure[i].y][figure[i].x]:
         return False
     return True
 
 
 while True:
-    dx = 0
+    dx, rotate = 0, False
     game_sc.fill(pygame.Color('black'))
+    sc.blit(bg, (0, 0))
+    sc.blit(game_sc, (20, 20))
+    game_sc.blit(game_bg, (0, 0))
     
     
     
@@ -59,6 +67,8 @@ while True:
                 dx = 1
             elif event.key == pygame.K_DOWN:
                 anim_limit = 100
+            elif event.key == pygame.K_r:
+                rotate = True
    
    
    
@@ -68,6 +78,9 @@ while True:
         if not check_borders():
             figure = deepcopy(figure_old)
             break
+    
+
+    #move y
     anim_count += anim_speed
     if anim_count > anim_limit:
         anim_count = 0
@@ -82,8 +95,33 @@ while True:
                 anim_limit = 2000
                 break 
    
+                #check lines
+                
+            line = H - 1
+            for row in range(H - 1, -1, -1):
+                count = 0
+                for i in range(W):
+                    if field[row][i]:
+                        count += 1
+                    field[line][i] = field[row][i]
+                if count < W:
+                    line -= 1
 
 
+                #rotate
+
+
+    center = figure[0]            
+    figure_old = deepcopy(figure)
+    if rotate:
+        for i in range(4):
+            x = figure[i].y - center.y
+            y = figure[i].x - center.x
+            figure[i].x = center.x - x
+            figure[i].y = center.y + y
+            if not check_borders():
+                figure = deepcopy(figure_old)
+                break
     #draw grid
     [pygame.draw.rect(game_sc, (40, 40, 40), i_rect, 1) for i_rect in grid] 
     #draw figure
