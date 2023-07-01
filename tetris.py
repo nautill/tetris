@@ -1,26 +1,23 @@
-import pygame
-from copy import deepcopy
-from random import choice, randrange
+import pygame,sys
+from grid import Grid
 
-import pygame
-from copy import deepcopy
-from random import choice, randrange
+pygame.init()
+dark_blue = (44, 44, 127)
+screen = pygame.display.set_mode((300, 600))
+pygame.display.set_caption("Tetris")
+
+clock =pygame.time.Clock()
+
+game_grid = Grid()
+game_grid.print_grid()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
 
-width, height = 10, 20
-TILE = 45
-RESOLUTION = width * TILE, height * TILE
-FPS = 60
-
-
-pygame.init
-game_sc = pygame.display.set_mode(RESOLUTION)
-clock = pygame.time.Clock()
-grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(width) for y in range(height)]
-figures_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],
-               [(0, -1), (-1, -1), (-1, 0), (0, 0)],
-               [(-1, 0), (-1, 1), (0, 0), (0, -1)],
-               [(0, 0), (-1, 0), (0, 1), (-1, -1)],
-               [(0, 0), (0, -1), (0, 1), (-1, -1)],
-               [(0, 0), (0, -1), (0, 1), (1, -1)],
-               [(0, 0), (0, -1), (0, 1), (-1, 0)]]
+    screen.fill(dark_blue)
+    pygame.display.update()
+    clock.tick(60) 
